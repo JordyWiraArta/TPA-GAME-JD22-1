@@ -62,9 +62,7 @@ public class questScript : MonoBehaviour
                         quest2 = true; 
                         talk = false;
                     }
-                }
-
-                if (Input.GetKeyDown(KeyCode.F))
+                }else if (Input.GetKeyDown(KeyCode.F))
                 {
                     talk = true;
                     asunaQuestMessage1.SetActive(true);

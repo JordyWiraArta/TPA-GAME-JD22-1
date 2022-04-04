@@ -10,12 +10,12 @@ public class MovementScript : MonoBehaviour
 
     [SerializeField] private float groundY;
     [SerializeField] private LayerMask groundMaskLayer;
-    [SerializeField] private float jumpSpeed, directionalSpeed;
+    [SerializeField] private float height, directionalSpeed;
 
     private float gravity = -9.8f;
     private Vector3 velocity;
 
-    private bool isJump;
+    private bool isJump, isHorizontal, isVertical;
 
     // Start is called before the first frame update
     void Start()
@@ -33,11 +33,10 @@ public class MovementScript : MonoBehaviour
         }
 
         
-        if (isGrounded() == true)
+        if (isGrounded() == true && velocity.y == 0)
         {
             animator.SetFloat("Pos X", Input.GetAxis("Horizontal"));
             animator.SetFloat("Pos Y", Input.GetAxis("Vertical"));
-
             animator.SetBool("ISJUMP", false);
 
             if (Input.GetButtonDown("Jump"))
@@ -45,7 +44,24 @@ public class MovementScript : MonoBehaviour
                 isJump = true;
                 animator.SetBool("ISJUMP", true);
             }
+        } else if(velocity.y > 0)
+        {
+           /* isHorizontal = Input.GetButtonDown("Horizontal");
+            isVertical = Input.GetButtonDown("Vertical");
+            if (isHorizontal)
+            {
+                velocity.x = Input.GetAxis("Horizontal") * directionalSpeed;
+                isHorizontal = false;
+            }
+
+            if (isVertical)
+            {
+                velocity.z = Input.GetAxis("Vertical") * directionalSpeed;
+                isVertical = false;
+            }*/
         }
+
+
         else if (!isJump && isGrounded() == false)
         {
             animator.SetBool("ISJUMP", true);
@@ -53,10 +69,10 @@ public class MovementScript : MonoBehaviour
             
         if(isJump)
         {
-            velocity.y = Mathf.Sqrt(jumpSpeed * -2 * gravity);
+            velocity.y = Mathf.Sqrt(height * -2 * gravity);
             isJump = false;
         }
-
+       
         velocity.y += (gravity * Time.deltaTime);
         playerController.Move(velocity * Time.deltaTime);
     }

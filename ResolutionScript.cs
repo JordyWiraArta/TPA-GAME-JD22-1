@@ -8,11 +8,11 @@ public class ResolutionScript : MonoBehaviour
 
     [SerializeField] TMPro.TMP_Dropdown resolutionDropdown;
     private Resolution[] resolutionList;
+
     // Start is called before the first frame update
     void Start()
     {
         resolutionList = Screen.resolutions;
-        resolutionDropdown.ClearOptions();
 
         int currentResolutionIndex = 0;
         int i = 0;

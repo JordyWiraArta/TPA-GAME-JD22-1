@@ -27,54 +27,42 @@ public class MovementScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (velocity.y <0 && isGrounded())
         {
             velocity.y = 0;
         }
 
-        
-        if (isGrounded() == true && velocity.y == 0)
+        if (!questScript.talk)
         {
-            animator.SetFloat("Pos X", Input.GetAxis("Horizontal"));
-            animator.SetFloat("Pos Y", Input.GetAxis("Vertical"));
-            animator.SetBool("ISJUMP", false);
-
-            if (Input.GetButtonDown("Jump"))
+            if (isGrounded() == true && velocity.y == 0)
             {
-                isJump = true;
+                animator.SetFloat("Pos X", Input.GetAxis("Horizontal"));
+                animator.SetFloat("Pos Y", Input.GetAxis("Vertical"));
+                animator.SetBool("ISJUMP", false);
+
+                if (Input.GetButtonDown("Jump"))
+                {
+                    isJump = true;
+                    animator.SetBool("ISJUMP", true);
+                }
+            }
+
+
+            else if (!isJump && isGrounded() == false)
+            {
                 animator.SetBool("ISJUMP", true);
             }
-        } else if(velocity.y > 0)
-        {
-           /* isHorizontal = Input.GetButtonDown("Horizontal");
-            isVertical = Input.GetButtonDown("Vertical");
-            if (isHorizontal)
-            {
-                velocity.x = Input.GetAxis("Horizontal") * directionalSpeed;
-                isHorizontal = false;
-            }
-
-            if (isVertical)
-            {
-                velocity.z = Input.GetAxis("Vertical") * directionalSpeed;
-                isVertical = false;
-            }*/
-        }
-
-
-        else if (!isJump && isGrounded() == false)
-        {
-            animator.SetBool("ISJUMP", true);
-        }
             
-        if(isJump)
-        {
-            velocity.y = Mathf.Sqrt(height * -2 * gravity);
-            isJump = false;
-        }
+            if(isJump)
+            {
+                velocity.y = Mathf.Sqrt(height * -2 * gravity);
+                isJump = false;
+            }
        
-        velocity.y += (gravity * Time.deltaTime);
-        playerController.Move(velocity * Time.deltaTime);
+            velocity.y += (gravity * Time.deltaTime);
+            playerController.Move(velocity * Time.deltaTime);
+        }
     }
 
     private bool isGrounded()

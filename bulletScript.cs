@@ -6,6 +6,7 @@ public class bulletScript : MonoBehaviour
 {
     [SerializeField] private float limitDestroy;
     private float timer;
+    public static Collision bulletCollide;
 
     // Update is called once per frame
     void Update()
@@ -17,6 +18,7 @@ public class bulletScript : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        bulletCollide = collision;
         Destroy(this.gameObject);
     }
 }

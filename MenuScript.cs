@@ -12,6 +12,7 @@ public class MenuScript : MonoBehaviour
 
     public void Start()
     {
+        Time.timeScale = 1;
         main.SetActive(true);
         setting.SetActive(false);
     }
@@ -19,6 +20,7 @@ public class MenuScript : MonoBehaviour
     public void playGameScene()
     {
         SceneManager.LoadScene(1);
+
     }
 
     public void quitGameScene()

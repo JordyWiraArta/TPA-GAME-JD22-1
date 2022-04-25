@@ -2,21 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class pistolAmmoScript : MonoBehaviour
+public class AmmoClass : MonoBehaviour
 {
     public int currAmmo, extraAmmo, megazineSize;
 
-    private void Update()
-    {
-        if (PickUpForPistolScript.plusAmmo)
-        {
-            extraAmmo += megazineSize;
-            PickUpForPistolScript.plusAmmo = false;
-        }
-        if ((currAmmo == 0 && extraAmmo != 0) || Input.GetKeyDown(KeyCode.R)) pistolReload();
-    }
-
-    public void pistolReload()
+    public void reload(int currAmmo, int extraAmmo, int megazineSize)
     {
         if(extraAmmo > megazineSize)
         {
@@ -37,6 +27,14 @@ public class pistolAmmoScript : MonoBehaviour
                 extraAmmo = 0;
             }
         }
+
+        this.currAmmo = currAmmo;
+        this.extraAmmo = extraAmmo;
+    }
+
+    public int plusAmmo(int extraAmmo, int megazineSize)
+    {
+        return extraAmmo + megazineSize;
     }
 
 }

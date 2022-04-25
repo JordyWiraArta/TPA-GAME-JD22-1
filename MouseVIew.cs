@@ -9,7 +9,9 @@ public class MouseVIew : MonoBehaviour
     [SerializeField] private float sensitivity;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private Camera cam;
-    [SerializeField] private Cinemachine.AxisState axisX, axisY;
+    public Cinemachine.AxisState axisX, axisY;
+
+    [SerializeField] private Transform asunaPos;
 
     // zoom in
     [SerializeField] private CinemachineVirtualCamera vcam;
@@ -32,7 +34,7 @@ public class MouseVIew : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        rayAim();
+        rayAim(Mathf.Infinity);
         if (!questScript.talk)
         {
             axisX.Update(Time.deltaTime);
@@ -51,19 +53,29 @@ public class MouseVIew : MonoBehaviour
 
     private void LateUpdate()
     {
-        PlayerCamLookAt.eulerAngles = new Vector3(axisY.Value, axisX.Value, 0) * sensitivity;
+        if (!questScript.talk)
+        {
+            PlayerCamLookAt.eulerAngles = new Vector3(axisY.Value, axisX.Value, 0) * sensitivity;
 
-        float yCamPos = cam.transform.rotation.eulerAngles.y;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yCamPos, 0), rotationSpeed * Time.deltaTime);
+            float yCamPos = cam.transform.rotation.eulerAngles.y;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yCamPos, 0), rotationSpeed * Time.deltaTime);
+        } else
+        {
+            Quaternion targetRot = Quaternion.LookRotation(asunaPos.position - transform.position);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 100 * Time.deltaTime);
+        }
     }
 
-    private void rayAim()
+    public RaycastHit rayAim(float range)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenCenter);
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimMask))
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, range, aimMask))
         {
             aimSphere.position = Vector3.Lerp(aimSphere.position, hit.point, sensitivity * Time.deltaTime);
         }
+
+        return hit;
     }
     
 }

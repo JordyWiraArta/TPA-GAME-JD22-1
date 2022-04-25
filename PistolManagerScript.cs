@@ -3,25 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-public class PickUpForPistolScript  : MonoBehaviour
+public class PistolManagerScript  : MonoBehaviour
 {
     // pistol
-    [SerializeField] private GameObject pistol;
-    [SerializeField] private Rig rightHand;
+    public GameObject pistol;
+    public Rig rightHand;
     [SerializeField] private GameObject pistolOnField;
 
-    [SerializeField] private LayerMask weaponMask;
     [SerializeField] private LayerMask ammoMask;
-    private Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
 
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject interact;
     [SerializeField] private TMPro.TMP_Text InteractText;
 
     bool anim = false;
-
-    public static bool plusAmmo;
     public static bool getPistol;
+    public bool isInit;
+    AmmoClass ammo;
+
+    public int currAmmo, extraAmmo, megazineSize;
+    public float fireRate, bulletSpeed, bulletDrop;
+    public int damage;
+    public Transform shootAtPosition;
+
+    MouseVIew mv;
+    RaycastHit hit;
 
     void Start()
     {
@@ -30,28 +36,34 @@ public class PickUpForPistolScript  : MonoBehaviour
 
         pistol.SetActive(false);
         rightHand.weight = 0;
-        
+        ammo = new AmmoClass();
+        mv = GetComponent<MouseVIew>();
     }
 
 
     void Update()
     {
-        
-        Ray ray = Camera.main.ScreenPointToRay(screenCenter);
-        if(questScript.state >= 1)
+        hit = mv.rayAim(8f);
+        if (questScript.state == 1)
         {
-            if (Input.GetKeyDown(KeyCode.F) && Physics.Raycast(ray, out RaycastHit hit, 4f, weaponMask) )
+            if(hit.transform && hit.transform.CompareTag("pistol"))
             {
-                pistolOnField.SetActive(false);
-                pistol.SetActive(true);
+                interact.SetActive(true);
+                InteractText.SetText("Press [F] to pickup weapon");
+                if (Input.GetKeyDown(KeyCode.F) )
+                {
+                    pistolOnField.SetActive(false);
+                    pistol.SetActive(true);
 
-                anim = true;
+                    anim = true;
+                }
             }
-
-            if(rightHand.weight >= 1)
+            if(rightHand.weight == 1)
             {
                 anim = false;
                 getPistol = true;
+                isInit = true;
+                WeaponManagerScript.isPistol = true;
             }
         
             if (anim)
@@ -64,16 +76,22 @@ public class PickUpForPistolScript  : MonoBehaviour
 
         if (getPistol)
         {
-            ammoPickup(ray);
-
+            ammoPickup();
+            if (((currAmmo == 0 && extraAmmo != 0) || Input.GetKeyDown(KeyCode.R)) && WeaponManagerScript.isPistol) 
+            {
+                ammo.reload(currAmmo, extraAmmo, megazineSize);
+                currAmmo = ammo.currAmmo;
+                extraAmmo = ammo.extraAmmo;
+            }
+            //Debug.Log(currAmmo + " " + extraAmmo);
         }
 
     }
 
 
-    void ammoPickup(Ray ray)
+    void ammoPickup()
     {
-        bool rayHitAmmo = Physics.Raycast(ray, out RaycastHit hit, 8f, ammoMask);
+        bool rayHitAmmo = hit.transform && hit.transform.CompareTag("PistolAmmo");
         bool nearAmmo = Physics.CheckSphere(player.transform.position, 1.5f, ammoMask);
         if (rayHitAmmo || nearAmmo)
         {
@@ -84,6 +102,7 @@ public class PickUpForPistolScript  : MonoBehaviour
                 if (rayHitAmmo)
                 {
                     hit.transform.gameObject.SetActive(false);
+                    extraAmmo = ammo.plusAmmo(extraAmmo, megazineSize);
                 }
 
                 if (nearAmmo)
@@ -91,16 +110,16 @@ public class PickUpForPistolScript  : MonoBehaviour
                     Collider[] ammos = Physics.OverlapSphere(player.transform.position, 1.5f, ammoMask);
                     foreach(Collider ammo in ammos)
                     {
+                        if (ammo.transform.CompareTag("PistolAmmo"))
+                        {
                         ammo.transform.gameObject.SetActive(false);
+                        extraAmmo =  this.ammo.plusAmmo(extraAmmo, megazineSize);
+                        }
                         break;
                     }
                 }
 
-                plusAmmo = true;
             }
-        } else
-        {
-            interact.SetActive(false);
         }
     }
 
